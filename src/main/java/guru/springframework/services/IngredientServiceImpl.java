@@ -8,6 +8,8 @@ import guru.springframework.domain.Recipe;
 import guru.springframework.repositories.RecipeRepository;
 import guru.springframework.repositories.UnitOfMeasureRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,8 @@ public class IngredientServiceImpl implements IngredientService {
     private final IngredientCommandToIngredient ingredientCommandToIngredient;
     private final RecipeRepository recipeRepository;
     private final UnitOfMeasureRepository unitOfMeasureRepository;
+    Logger logger = LoggerFactory.getLogger(IngredientServiceImpl.class);
+
 
     public IngredientServiceImpl(IngredientToIngredientCommand ingredientToIngredientCommand,
                                  IngredientCommandToIngredient ingredientCommandToIngredient,
@@ -41,7 +45,8 @@ public class IngredientServiceImpl implements IngredientService {
 
         if (!recipeOptional.isPresent()){
             //todo impl error handling
-            log.error("recipe id not found. Id: " + recipeId);
+//            log.error("recipe id not found. Id: " + recipeId);
+            logger.debug("recipe id not found. Id:", recipeId);
         }
 
         Recipe recipe = recipeOptional.get();
@@ -52,7 +57,7 @@ public class IngredientServiceImpl implements IngredientService {
 
         if(!ingredientCommandOptional.isPresent()){
             //todo impl error handling
-            log.error("Ingredient id not found: " + ingredientId);
+            logger.debug("Ingredient id not found: " , ingredientId);
         }
 
         return ingredientCommandOptional.get();
@@ -66,7 +71,7 @@ public class IngredientServiceImpl implements IngredientService {
         if(!recipeOptional.isPresent()){
 
             //todo toss error if not found!
-            log.error("Recipe not found for id: " + command.getRecipeId());
+            logger.debug("Recipe not found for id: " , command.getRecipeId());
             return new IngredientCommand();
         } else {
             Recipe recipe = recipeOptional.get();
@@ -116,13 +121,13 @@ public class IngredientServiceImpl implements IngredientService {
     @Override
     public void deleteById(String recipeId, String idToDelete) {
 
-        log.debug("Deleting ingredient: " + recipeId + ":" + idToDelete);
+        logger.debug("Deleting ingredient: " , recipeId , ":" , idToDelete);
 
         Optional<Recipe> recipeOptional = recipeRepository.findById(recipeId);
 
         if(recipeOptional.isPresent()){
             Recipe recipe = recipeOptional.get();
-            log.debug("found recipe");
+            logger.debug("found recipe");
 
             Optional<Ingredient> ingredientOptional = recipe
                     .getIngredients()
@@ -131,14 +136,14 @@ public class IngredientServiceImpl implements IngredientService {
                     .findFirst();
 
             if(ingredientOptional.isPresent()){
-                log.debug("found Ingredient");
+                logger.debug("found Ingredient");
                 Ingredient ingredientToDelete = ingredientOptional.get();
                // ingredientToDelete.setRecipe(null);
                 recipe.getIngredients().remove(ingredientOptional.get());
                 recipeRepository.save(recipe);
             }
         } else {
-            log.debug("Recipe Id Not found. Id:" + recipeId);
+            logger.debug("Recipe Id Not found. Id:" , recipeId);
         }
     }
 }
