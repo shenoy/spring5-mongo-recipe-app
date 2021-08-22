@@ -22,6 +22,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 public class RecipeCommand {
+
     private String id;
 
     @NotBlank
@@ -51,5 +52,5 @@ public class RecipeCommand {
     private Byte[] image;
     private Difficulty difficulty;
     private NotesCommand notes;
-    private Set<CategoryCommand> categories = new HashSet<>();
+    private List<CategoryCommand> categories = new ArrayList<>();
 }
